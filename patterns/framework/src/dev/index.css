@@ -33,3 +33,9 @@
     left: 50%;
     background: lightblue;
     }
+
+canvas {
+    height: 100%;
+    width: 100%;
+    background: white;
+    }
