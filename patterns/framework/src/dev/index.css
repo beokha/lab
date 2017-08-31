@@ -38,7 +38,6 @@ canvas {
     z-index: -5;
     }
 .beo_canvas {
-    position: absolute;
     background: white;
     z-index: 5;
     }

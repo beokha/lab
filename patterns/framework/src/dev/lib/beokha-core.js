@@ -8,10 +8,7 @@ let beo = (function () {
     }
 
     beo.prototype.action = function() {
-        let init = () => {
-
-            },
-            getThis = (() => {
+        let getThis = (() => {
                 return this;
             })(),
             setPaintingObj = function() {
@@ -36,24 +33,6 @@ let beo = (function () {
                 let attr_len, attr = [],
                     list = iter(this.paintingObj_list);
 
-                // i, len, j,
-                /*for( i = 0, len = list.length ; i < len ; i += 1 ) {
-
-                    attr_len = list[i].elem.attributes.length;
-                    if(attr_len > 0) {
-
-                        attr = list[i].elem.attributes;
-                        for( j = 0 ; j < attr_len ; j += 1 ) {
-
-                            if(( attr[j].name === "class" || attr[j].name === "id" ) && ( obj === attr[j].value )) {
-
-                                return list[i];
-                            }
-                        }
-                    }
-                }*/
-
-                // My realization of iterations
                 while( list.hasNext() ) {
 
                     attr_len = list.current().elem.attributes.length;
@@ -85,7 +64,6 @@ let beo = (function () {
             };
 
         return {
-            init: init,
             setPaintingObj: setPaintingObj,
             getPaintingObject: getPaintingObject,
             getPaintingObjects: getPaintingObjects,
@@ -98,8 +76,7 @@ let beo = (function () {
         let i, len;
 
         for(i = 0, len = this.paintingObj_list.length ; i < len ; i += 1) {
-
-            // TODO: Rewrite function: Find and delete all canvas on page after calling 'draw' method
+                                                                                                        // TODO: Rewrite function: Find and delete all canvas on page after calling 'draw' method
 
 
             this.paintingObj_list[i].elem.addEventListener('click', function(e) {
@@ -126,8 +103,8 @@ let beo = (function () {
 
                     // Element contain canvas
                     isCanvas = true;
-
                     let canvas = children.current().remove();
+
                     break;
                 }
                 children.increase();
@@ -172,7 +149,7 @@ let beo = (function () {
             Canvas.canvasAction('out', e, canvas);
         }, false);
 
-        return src.appendChild(canvas);
+        src.appendChild(canvas);
     }
 
     function GetElemSize(elem) {
@@ -224,6 +201,7 @@ let beo = (function () {
         ctx.beginPath();
         ctx.moveTo(Canvas.prevX, Canvas.prevY);
         ctx.lineTo(Canvas.currX, Canvas.currY);
+                                                                                                                        // TODO: Canvas bone style
         ctx.strokeStyle = 'red';
         ctx.lineWidth = '2';
         ctx.stroke();
@@ -247,31 +225,46 @@ let beo = (function () {
                 Canvas.flag = true;
                 Canvas.dot = true;
 
-                /*if( Canvas.dot ) {
-                    canvas.ctx.beginPath();
-                    canvas.ctx.fillStyle = 'black';
-                    canvas.ctx.fillRect(Canvas.currX, Canvas.currY, 2, 2);
-                    canvas.ctx.closePath();
+                if( Canvas.dot ) {
+                    let ctx = Canvas.getCanvas(canvas).ctx;
+
+                    ctx.beginPath();
+
+                                                                                                                        // TODO: Canvas bone style
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(Canvas.currX, Canvas.currY, 3, 3);
+                    ctx.closePath();
 
                     Canvas.dot = false;
-                }*/
+                }
 
                 break;
 
-            case 'up' || 'out':
+            case 'up':
                 Canvas.flag = false;
                 break;
 
+            case 'out':
+
+                Canvas.currX = 0;
+                Canvas.currY = 0;
+
+                break;
+
             case 'move':
+
                 if( Canvas.flag ) {
 
-                    Canvas.prevX = Canvas.currX;
-                    Canvas.prevY = Canvas.currY;
+                    if(Canvas.currX === 0 || Canvas.currY === 0) {
+                        Canvas.prevX = e.clientX - canvas.getBoundingClientRect().left;
+                        Canvas.prevY = e.clientY - canvas.getBoundingClientRect().top;
+                    } else {
+                        Canvas.prevX = Canvas.currX;
+                        Canvas.prevY = Canvas.currY;
+                    }
 
                     Canvas.currX = e.clientX - canvas.getBoundingClientRect().left;
                     Canvas.currY = e.clientY - canvas.getBoundingClientRect().top;
-
-                    console.log("window: " + e.clientX + " " + e.clientY);
 
                     Canvas.draw(canvas);
                 }
