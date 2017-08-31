@@ -4,12 +4,12 @@
     height: 250px;
     }
 .block_1 {
-    top: 5%;
+    top: 0;
     left: 0;
     background: yellowgreen;
     }
 .block_2 {
-    top: 5%;
+    top: 0;
     left: 50%;
     background: green;
     }
@@ -35,7 +35,10 @@
     }
 
 canvas {
-    height: 100%;
-    width: 100%;
+    z-index: -5;
+    }
+.beo_canvas {
+    position: absolute;
     background: white;
+    z-index: 5;
     }

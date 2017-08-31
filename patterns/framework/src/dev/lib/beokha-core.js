@@ -95,76 +95,191 @@ let beo = (function () {
 
     beo.prototype.draw = function () {
 
-        let i, len,
-            attr, attr_len,
-            that = this;
+        let i, len;
 
         for(i = 0, len = this.paintingObj_list.length ; i < len ; i += 1) {
+
+            // TODO: Rewrite function: Find and delete all canvas on page after calling 'draw' method
+
+
             this.paintingObj_list[i].elem.addEventListener('click', function(e) {
                 let src;
                 e = e || window.e;
                 src = e.target;
 
-                // Actually not needed check, because:
-                // we set listeners on elem, of this array and here
-                // we check: is our array contain element on what we clicked
-                /*attr_len = src.attributes.length;
-                if( attr_len > 0 ) {
-
-                    attr = iter(src.attributes);
-                    while( attr.hasNext() ) {
-
-                        if( attr.current().name === 'class' || attr.current().name === 'id' ) {
-
-
-                            if( !that.paintingObj_list.includes( attr.current().value ) ) {
-                                console.log(attr.current().value);
-                                console.log(that.paintingObj_list);
-                                console.log('false');
-                            } else {
-                                console.log('true');
-                            }
-                            //console.log(attr.current().name + " " + attr.current().value);
-                        }
-
-                        attr.increase();
-                    }
-                }*/
-
-                // Check: IF element contain 'canvas' element
-                if( src.hasChildNodes() ) {
-
-                    let children = iter(src.childNodes),
-                        isCanvas = false;
-
-                    while( children.hasNext() ) {
-
-                        if( children.current().nodeName.toLowerCase().includes('canvas') ) {
-
-                            // Element contain canvas
-                            isCanvas = true;
-                            break;
-                        }
-                        children.increase();
-                    }
-
-                    if( !isCanvas ) {
-                        createCanvasElement(src);
-                    }
-                }
-
-                facade.stopDef(e);
+                checkForCanvasInDOM(src);
+                //facade.stopDef(e);
             });
+        }
+    }
+
+    function checkForCanvasInDOM(src) {
+        // Check: IF element contain 'canvas' element
+        if( src.hasChildNodes() ) {
+
+            let children = iter(src.childNodes),
+                isCanvas = false;
+
+            while( children.hasNext() ) {
+
+                if( children.current().nodeName.toLowerCase().includes('canvas') ) {
+
+                    // Element contain canvas
+                    isCanvas = true;
+
+                    let canvas = children.current().remove();
+                    break;
+                }
+                children.increase();
+            }
+
+            if( !isCanvas ) {
+                createCanvasElement(src);
+            }
         }
     }
 
     function createCanvasElement(src) {
 
         let canvas = document.createElement('canvas'),
-            canvasClassName = src.getAttribute('id') || src.getAttribute('class') + '__canvas';
+            canvasClassName = src.getAttribute('id') || src.getAttribute('class') + '__canvas',
+            parentSize;
 
         canvas.className = canvasClassName;
+        canvas.classList.add('beo_canvas');
+        // Add to canvas class
+        canvas.classList.add('beo_canvas');
+
+        // Get parent metrics
+        parentSize = GetElemSize(src);
+        // Set metrics
+        canvas.setAttribute('height', `${parentSize.height}`);
+        canvas.setAttribute('width', `${parentSize.width}`);
+
+        // Add canvas to 'canvas array'
+        Canvas.addCanvas(canvas);
+        // Add listener to canvas
+        canvas.addEventListener('mousemove', function (e) {
+            Canvas.canvasAction('move', e, canvas);
+        }, false);
+        canvas.addEventListener('mousedown', function (e) {
+            Canvas.canvasAction('down', e, canvas);
+        }, false);
+        canvas.addEventListener('mouseup', function (e) {
+            Canvas.canvasAction('up', e, canvas);
+        }, false);
+        canvas.addEventListener('mouseout', function (e) {
+            Canvas.canvasAction('out', e, canvas);
+        }, false);
+
         return src.appendChild(canvas);
+    }
+
+    function GetElemSize(elem) {
+        return {
+            width: elem.offsetWidth,
+            height: elem.offsetHeight
+        }
+    }
+    
+    let Canvas = (function Canvas() {
+        let obj = {};
+
+        obj.canvases = [];
+        obj.flag = false;
+        obj.prevX = null;
+        obj.prevY = null;
+        obj.currX = null;
+        obj.currY = null;
+        obj.dot = false;
+
+        return obj;
+    })();
+
+    Canvas.addCanvas = function (newCanvas) {
+        let canvas = {
+            canvas: newCanvas,
+            ctx: newCanvas.getContext('2d')
+        };
+
+        this.canvases.push( canvas );
+    }
+    Canvas.getCanvas = function (canvas) {
+
+        let canvases = iter(Canvas.canvases);
+        while(canvases.hasNext()) {
+            if( canvases.current().canvas === canvas) {
+                return canvases.current();
+            }
+            canvases.increase();
+        }
+    }
+    Canvas.getCanvases = function () {
+        return this.canvases;
+    }
+    Canvas.draw = function (canvas) {
+
+        let ctx = Canvas.getCanvas(canvas).ctx;
+
+        ctx.beginPath();
+        ctx.moveTo(Canvas.prevX, Canvas.prevY);
+        ctx.lineTo(Canvas.currX, Canvas.currY);
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = '2';
+        ctx.stroke();
+        ctx.closePath();
+
+    }
+    Canvas.canvasAction = function(type, e, canvas) {
+
+        /*let currentMetrics = {
+            height:
+        }*/
+
+        switch ( type ) {
+
+            case 'down':
+                Canvas.prevX = Canvas.currX;
+                Canvas.prevY = Canvas.currY;
+                Canvas.currX = e.clientX - canvas.getBoundingClientRect().left;
+                Canvas.currY = e.clientY - canvas.getBoundingClientRect().top;
+
+                Canvas.flag = true;
+                Canvas.dot = true;
+
+                /*if( Canvas.dot ) {
+                    canvas.ctx.beginPath();
+                    canvas.ctx.fillStyle = 'black';
+                    canvas.ctx.fillRect(Canvas.currX, Canvas.currY, 2, 2);
+                    canvas.ctx.closePath();
+
+                    Canvas.dot = false;
+                }*/
+
+                break;
+
+            case 'up' || 'out':
+                Canvas.flag = false;
+                break;
+
+            case 'move':
+                if( Canvas.flag ) {
+
+                    Canvas.prevX = Canvas.currX;
+                    Canvas.prevY = Canvas.currY;
+
+                    Canvas.currX = e.clientX - canvas.getBoundingClientRect().left;
+                    Canvas.currY = e.clientY - canvas.getBoundingClientRect().top;
+
+                    console.log("window: " + e.clientX + " " + e.clientY);
+
+                    Canvas.draw(canvas);
+                }
+                break;
+
+            default:
+                break;
+        }
     }
 
     return beo;
