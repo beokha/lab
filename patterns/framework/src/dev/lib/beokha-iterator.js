@@ -3,22 +3,24 @@ let iterator = (function (array) {
 
     let data = array,
         index = 0,
-        that,
         length = data.length;
 
     return {
-        setThis: function () {
-            that = this;
+        current: function () {
+          return data[index];
         },
-        next: () => {
-            if(!that.hasNext()) {
+        increase: () => {
+            index += 1;
+        },
+        next: function() {
+            if(!this.hasNext()) {
                 return null;
             }
 
             index += 1;
-            return data[index - 1];
+            return data[index];
         },
-        hasNext: () => {
+        hasNext: function() {
             return index < length;
         }
     }

@@ -1,0 +1,43 @@
+.block_1, .block_2, .block_4, .block_5, #block_3, #block_6 {
+    position: absolute;
+    width: 50%;
+    height: 250px;
+    }
+.block_1 {
+    top: 0;
+    left: 0;
+    background: yellowgreen;
+    }
+.block_2 {
+    top: 0;
+    left: 50%;
+    background: green;
+    }
+#block_3 {
+    top: 250px;
+    left: 0;
+    background: brown;
+    }
+.block_4 {
+    top: 250px;
+    left: 50%;
+    background: saddlebrown;
+    }
+.block_5 {
+    top: 500px;
+    left: 0;
+    background: lightgray;
+    }
+#block_6 {
+    top: 500px;
+    left: 50%;
+    background: lightblue;
+    }
+
+canvas {
+    z-index: -5;
+    }
+.beo_canvas {
+    background: white;
+    z-index: 5;
+    }
