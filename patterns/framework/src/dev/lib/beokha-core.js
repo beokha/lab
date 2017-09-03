@@ -5,6 +5,14 @@ import facade from './beokha-facade.js';
 let beo = (function () {
     function beo() {
         this.paintingObj_list = [];
+
+        this.config = function (  ) {
+            let obj = {};
+
+            obj.initOnClick = false;
+
+            return obj;
+        }();
     }
 
     beo.prototype.action = function() {
@@ -54,43 +62,78 @@ let beo = (function () {
             },
             getPaintingObjects = () => this.paintingObj_list,
             setStyle = function(obj, style) {
-                let listObj = this.getPaintingObject(obj);
+                let holst = this.getPaintingObject(obj);
 
                 for(let key in style) {
                     if(style.hasOwnProperty(key)) {
-                        listObj[key] = style[key];
+                        if(!holst.style) { holst.style = {}; }
+                        holst.style[key] = style[key];
                     }
                 }
+            },
+            setConfig =  ( config ) => {
+
+                for(let key in config) {
+                    if(config.hasOwnProperty(key)) {
+
+                        this.config[key] = config[key];
+                    }
+                }
+
+                return this;
             };
 
         return {
             setPaintingObj: setPaintingObj,
             getPaintingObject: getPaintingObject,
             getPaintingObjects: getPaintingObjects,
-            setStyle: setStyle
+            setStyle: setStyle,
+            setConfig: setConfig
         }
     }
 
     beo.prototype.draw = function () {
 
-        let i, len;
+        if(this.config.initOnClick) {
+            let i, len, that = this;
 
-        for(i = 0, len = this.paintingObj_list.length ; i < len ; i += 1) {
-                                                                                                        // TODO: Rewrite function: Find and delete all canvas on page after calling 'draw' method
+            for(i = 0, len = this.paintingObj_list.length ; i < len ; i += 1) {
+                                                // TODO: Rewrite function: Find and delete all canvas on page after calling 'draw' method
+                this.paintingObj_list[i].elem.addEventListener('click', function(e) {
+                    let src;
+                    e = e || window.e;
+                    src = e.target;
 
 
-            this.paintingObj_list[i].elem.addEventListener('click', function(e) {
-                let src;
-                e = e || window.e;
-                src = e.target;
+                                                // TODO: Hack - why new listener on the Canvas create?
+                    if(src.tagName.toLowerCase() === 'canvas') { return; }
 
-                checkForCanvasInDOM(src);
-                //facade.stopDef(e);
+                    let srcIdent = iter(src.attributes),
+                        srcIdentValue;
+
+                    while(srcIdent.hasNext()) {
+
+                        srcIdentValue = (srcIdent.current().name === 'class') ? src.className
+                                            : src.id;
+
+                        if(srcIdentValue != null) { break; }
+                        srcIdent.increase()
+                    }
+
+                    let virtualElem = that.action().getPaintingObject(srcIdentValue);
+                    checkForCanvasInDOM(virtualElem.elem, virtualElem);
+                });
+            }
+        } else {
+
+            this.paintingObj_list.map((holst) => {
+                checkForCanvasInDOM(holst.elem, holst);
             });
         }
+
     }
 
-    function checkForCanvasInDOM(src) {
+    function checkForCanvasInDOM(src, holst) {
         // Check: IF element contain 'canvas' element
         if( src.hasChildNodes() ) {
 
@@ -103,20 +146,20 @@ let beo = (function () {
 
                     // Element contain canvas
                     isCanvas = true;
-                    let canvas = children.current().remove();
-
+                    // TODO: Bad
+                    children.current().remove();
                     break;
                 }
                 children.increase();
             }
 
             if( !isCanvas ) {
-                createCanvasElement(src);
+                createCanvasElement(src, holst);
             }
         }
     }
 
-    function createCanvasElement(src) {
+    function createCanvasElement(src, holst) {
 
         let canvas = document.createElement('canvas'),
             canvasClassName = src.getAttribute('id') || src.getAttribute('class') + '__canvas',
@@ -126,15 +169,16 @@ let beo = (function () {
         canvas.classList.add('beo_canvas');
         // Add to canvas class
         canvas.classList.add('beo_canvas');
-
         // Get parent metrics
         parentSize = GetElemSize(src);
         // Set metrics
         canvas.setAttribute('height', `${parentSize.height}`);
         canvas.setAttribute('width', `${parentSize.width}`);
 
+
+        // Set style if exist
         // Add canvas to 'canvas array'
-        Canvas.addCanvas(canvas);
+        Canvas.addCanvas(canvas, holst.style);
         // Add listener to canvas
         canvas.addEventListener('mousemove', function (e) {
             Canvas.canvasAction('move', e, canvas);
@@ -170,13 +214,16 @@ let beo = (function () {
         obj.currY = null;
         obj.dot = false;
 
+        obj.canvasOutTimeout = null;
+
         return obj;
     })();
 
-    Canvas.addCanvas = function (newCanvas) {
+    Canvas.addCanvas = function (newCanvas, style) {
         let canvas = {
             canvas: newCanvas,
-            ctx: newCanvas.getContext('2d')
+            ctx: newCanvas.getContext('2d'),
+            style: style
         };
 
         this.canvases.push( canvas );
@@ -196,14 +243,15 @@ let beo = (function () {
     }
     Canvas.draw = function (canvas) {
 
-        let ctx = Canvas.getCanvas(canvas).ctx;
+        let ctx = Canvas.getCanvas(canvas).ctx,
+            style = Canvas.getCanvas(canvas).style;
 
         ctx.beginPath();
         ctx.moveTo(Canvas.prevX, Canvas.prevY);
         ctx.lineTo(Canvas.currX, Canvas.currY);
                                                                                                                         // TODO: Canvas bone style
-        ctx.strokeStyle = 'red';
-        ctx.lineWidth = '2';
+        ctx.strokeStyle = (!style) ? 'black' : (style.bone) ? style.bone.color : 'black';
+        ctx.lineWidth = (!style) ? '2' : (style.bone) ? style.bone.size : '2';
         ctx.stroke();
         ctx.closePath();
 
@@ -226,13 +274,16 @@ let beo = (function () {
                 Canvas.dot = true;
 
                 if( Canvas.dot ) {
-                    let ctx = Canvas.getCanvas(canvas).ctx;
+                    let ctx = Canvas.getCanvas(canvas).ctx,
+                        style = Canvas.getCanvas(canvas).style,
+                        dotSize = 3;
 
                     ctx.beginPath();
 
-                                                                                                                        // TODO: Canvas bone style
-                    ctx.fillStyle = 'black';
-                    ctx.fillRect(Canvas.currX, Canvas.currY, 3, 3);
+                    ctx.fillStyle = (!style) ? 'black' : (style.dot) ? style.dot.color : 'black';
+                    dotSize = (!style) ? '3' : (style.dot) ? style.dot.size : '3';
+                    ctx.fillRect(Canvas.currX, Canvas.currY, dotSize, dotSize);
+
                     ctx.closePath();
 
                     Canvas.dot = false;
@@ -249,11 +300,17 @@ let beo = (function () {
                 Canvas.currX = 0;
                 Canvas.currY = 0;
 
+                Canvas.canvasOutTimeout = setTimeout(function (  ) {
+                    Canvas.flag = false;
+                }, 1000);
+
                 break;
 
             case 'move':
 
                 if( Canvas.flag ) {
+
+                    clearTimeout(Canvas.canvasOutTimeout);
 
                     if(Canvas.currX === 0 || Canvas.currY === 0) {
                         Canvas.prevX = e.clientX - canvas.getBoundingClientRect().left;
