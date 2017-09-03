@@ -1,13 +1,13 @@
 {
-  "name": "framework",
-  "version": "1.0.0",
+  "name": "Risovalka",
+  "version": "0.1.0",
   "description": "",
   "main": "beokha-core.js",
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "start": "webpack-dev-server --hot"
   },
-  "author": "",
+  "author": "Bilokha Danylo (beo)",
   "license": "ISC",
   "dependencies": {
     "babel-core": "^6.26.0",
