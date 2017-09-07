@@ -1,0 +1,21 @@
+.block {
+    margin-top: 20px;
+
+    &-title {
+
+        &__heading {
+            font-size: 1.28rem;
+            position: relative;
+            overflow: hidden;
+
+            }
+        &__heading::after {
+            position: absolute;
+            bottom: 0;
+            content: '';
+            width: 100%;
+            border-bottom: 2px solid @red;
+            }
+        }
+    }
+

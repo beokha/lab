@@ -1,0 +1,156 @@
+.carousel {
+
+    display: flex;
+    position: relative;
+    border-bottom: 5px solid @red;
+
+    &__image-wrapper {
+        max-height: 100%;
+        max-width: 100%;
+
+        & > img {
+            vertical-align: bottom;
+            }
+        }
+
+    &__article {
+        position: relative;
+        padding: 15px 20px 50px;
+        }
+
+    &__title {
+        font-size: 1.375em;
+        color: @header-text-color;
+        }
+
+    &__text {
+        margin-top: 20px;
+        }
+
+
+
+    /*
+        Summary:
+            Control
+     */
+    &__control {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        right: 22px;
+        bottom: 10px;
+        }
+
+    &-counter {
+
+        &__item {
+            display: inline-block;
+            &_current {
+                }
+            &_current::after {
+                content: '/';
+                color: @red;
+                }
+            &_static {
+                margin-left: -2px;
+                }
+            }
+
+
+        }
+
+    &__spinner {
+        margin-left: 10px;
+        height: 17px;
+        width: 17px;
+        border-radius: 50%;
+        background-color: @black;
+        }
+    &__spinner::after {
+        position: absolute;
+        content: ' ';
+        top: 0;
+        margin-left: 9px;
+        width: 0;
+        height: 0;
+        border-bottom: 10px solid @white;
+        border-left: 10px solid transparent;
+        transform: rotate(180deg);
+        }
+
+    &__button {
+        position: absolute;
+        width: 12px;
+        height: 24px;
+
+        border: 0;
+        padding: 0;
+        background: transparent;
+
+        &::before,
+        &::after {
+            content: '';
+            position: absolute;
+            border-bottom: 3px solid @red;
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+            height: 0;
+            width: 10px;
+            }
+
+
+        &::-moz-focus-inner {
+            margin: 0;
+            padding: 0;
+            }
+
+        &-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            }
+
+        &_prev {
+            left: -22px;
+
+            &::before {
+                position: absolute;
+                top: 6px;
+                left: 0px;
+                transform: rotate(135deg);
+
+                }
+
+            &::after {
+                transform: rotate(45deg);
+                position: absolute;
+                bottom: 6px;
+                left: 0;
+                }
+
+            }
+
+        &_next {
+
+            right: -22px;
+            &::before {
+                position: absolute;
+                top: 6px;
+                right: 0px;
+                transform: rotate(-135deg);
+                }
+
+            &::after {
+                transform: rotate(-45deg);
+                position: absolute;
+                bottom: 6px;
+                right: 0;
+                }
+            }
+
+        }
+
+
+    }
+

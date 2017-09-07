@@ -1,0 +1,61 @@
+.video {
+
+  &-title {
+    position: relative;
+
+    &:after {
+      position: absolute;
+      top: 50%;
+      content: '';
+      width: 100%;
+      border-bottom: 2px solid @red;
+      z-index: -2;
+      }
+
+    &__heading {
+      text-align: center;
+      color: @dark-blue;
+
+      &::after {
+        content: '';
+        left: 35%;
+        height: 100%;
+        width: 30%;
+        background-color: white;
+        border-bottom: 0;
+        z-index: -1;
+        }
+      }
+    }
+
+  &__list {
+      .list-reset;
+    }
+
+  &__item {
+    display: flex;
+    }
+
+  &__figure {
+
+    position: relative;
+    }
+
+  &__title {
+
+    margin-left: 10px;
+    font-weight: bold;
+    color: @black;
+    }
+
+  &-footer {
+
+
+    &__heading {
+      color: @deep-sky-blue;
+      cursor: pointer;
+      padding-bottom: 5px;
+      border-bottom: 5px solid black;
+      }
+    }
+  }

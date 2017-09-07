@@ -1,0 +1,48 @@
+html {
+    overflow-y: scroll;
+    min-height: 100%;
+    }
+
+body {
+    font-size: 87.5%;
+    color: @default-text;
+    padding: 0 10px;
+    }
+
+a {
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: none;
+        }
+    }
+.other-site-link {
+    font-size: 0.75rem;
+    color: @gray-medium;
+    }
+
+.g-clearfix {
+
+    &::before,
+    &::after {
+        content: "";
+        display: table;
+        }
+
+    &::after {
+        clear: both;
+        }
+    }
+
+.icon {
+    margin-left: 5px;
+    vertical-align: middle;
+
+    &_above {
+        position: absolute;
+        left: 5px;
+        bottom: 8px;
+        }
+    }
+
+

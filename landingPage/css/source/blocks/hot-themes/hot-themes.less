@@ -1,0 +1,41 @@
+.hot-themes {
+    display: flex;
+    margin-top: 30px;
+    background: @gray-medium;
+
+
+
+    &__title {
+        margin: 0;
+        padding: 0;
+        min-width: 120px;
+
+        background: @hot-themes-title-background;
+        }
+
+    &__heading {
+        margin: 0;
+        padding: 6px 16px;
+        font-weight: normal;
+        font-size: 1.28rem;
+        color: @white;
+        }
+
+    &__list {
+        .list-reset();
+        }
+
+    &__item {
+        display: inline-block;
+        }
+
+    &__link {
+        display: block;
+        height: calc(100% - 30px);
+        width: 100%;
+        margin: 0;
+        padding: 6px 12px;
+        font-size: 1.28rem;
+        color: @default-text;
+        }
+    }
