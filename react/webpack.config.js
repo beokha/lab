@@ -11,6 +11,9 @@ const config = {
 
     devServer: {
         inline: true,
+        historyApiFallback: true,
+        contentBase: "./",
+        hot: true,
         port: 8080
     },
 
