@@ -20,6 +20,9 @@ class Header extends Component {
                     <li className='nav__link'>
                         <Link to='/Login'> Login </Link>
                     </li>
+                    <li className="nav__link">
+                        <Link to="/counter"> Show counter </Link>
+                    </li>
                 </ul>
             </div>
         );

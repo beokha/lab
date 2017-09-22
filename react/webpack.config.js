@@ -14,8 +14,11 @@ const config = {
         historyApiFallback: true,
         contentBase: "./",
         hot: true,
-        port: 8080
+        port: 8080,
+
     },
+
+    devtool: 'source-map',
 
     module: {
         rules: [
